@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<script type="text/javascript" src="jquery.min.js"></script>
+<script type="text/javascript" src="bmob.js"></script>
+<script type="text/javascript" src="bmob-min.js"></script>
+<link type="text/css" rel="stylesheet" href="css/out_login.css">
+<link href="css/bootstrap.min.css" rel="stylesheet">
+<link href="css/styles.css" rel="stylesheet">
+<head>
+    <!--<style type="text/css">-->
+    <!--body{background:#FFBF00;text-align:center;}-->
+    <!--div{width:778px;margin:0 auto;background:#fff;text-align:left;}-->
+    <!--</style>-->
+</head>
+<script>
+    Bmob.initialize("912f235a5242dce2d7d849f726de9ffe","87bc7aeb2892f6ad4e6333a072a67176");
+    var password = Bmob.Object.extend("password");
+    var query = new Bmob.Query(password);
+    query.first({
+        success: function(object) {
+            // 查询成功
+            if(object.get('state')=='1'){
+                object.set('state','0');
+                object.save();
+            }else {
+                self.location='index.html';
+                alert("请输入密码");
+            }
+
+        },
+        error: function(error) {
+            alert("查询失败: " + error.code + " " + error.message);
+        }
+    });
+</script>
+<body>
+
+<!--<h1 align="center" style="display: block; margin-top: 200px;"></h1>-->
+<!--<p align="center">请输入你的登陆秘钥</p>-->
+
+<!--<input id="demo" sstyle="height:35px;" type="text">-->
+
+<!--<button  style="display: block; width: 85px;margin: 0 auto;margin-top: 10px;" type="button" onclick="myFunction()">确认</button>-->
+<!--<div class="col-md-6 col-md-offset-3 text-center">-->
+<!--<input type="submit" class="learn-more-btn" value=" 登录" onclick="myFunction()" />-->
+<!--</div>-->
+
+<div class="login">
+    <div class="row">
+        <div class="col-md-8 col-md-offset-2 text-center inner"
+             style="padding:0">
+            <form>
+                <p align="center">请输入你的学号</p>
+                <input size="25" style="height:35px;" id="demo" /><br />
+                <br>
+                <div class="row">
+                    <div class="col-md-6 col-md-offset-3 text-center">
+                        <input type="button" class="learn-more-btn" value="签到" onclick="myFunction()" />
+
+                    </div>
+                </div>
+                <p align="center" id="time_example">要查询的年月,例:2016-02</p>
+                <input size="20" style="height:25px;" id="demo1" /><br />
+                <input type="button" class="learn-more-btn" value="查询" onclick="searchAllMonth()" />
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    function myFunction()
+    {
+        var x=document.getElementById("demo").value;
+        Bmob.initialize("912f235a5242dce2d7d849f726de9ffe","87bc7aeb2892f6ad4e6333a072a67176");
+
+        if(x==""||isNaN(x))
+        {
+            alert("Not Numeric");
+        }else{
+            var sign_in = Bmob.Object.extend("sign_in");
+            var sign_info = new sign_in();
+            sign_info.set("signed_time", "1");
+            sign_info.set("s_id",x);
+            sign_info.save(null, {
+                success: function(object) {
+                    alert("签到成功,你的学号是"+x);
+                },
+                error: function(model, error) {
+                    alert("create object fail");
+                }
+            });
+        }
+    }
+
+    function arrive_timer_format(s) {
+        var t;
+        if(s > -1){
+            hour = Math.floor(s/3600);
+            min = Math.floor(s/60) % 60;
+            sec = s % 60;
+            day = parseInt(hour / 24);
+            if (day > 0) {
+                hour = hour - 24 * day;
+                t = day + "day " + hour + ":";
+            }
+            else t = hour + ":";
+            if(min < 10){t += "0";}
+            t += min + ":";
+            if(sec < 10){t += "0";}
+            t += sec;
+        }
+        return t;
+    }
+
+    function search()
+    {
+        var searchId=document.getElementById("demo").value;
+        var date=document.getElementById("demo1").value;
+        Bmob.initialize("912f235a5242dce2d7d849f726de9ffe","87bc7aeb2892f6ad4e6333a072a67176");
+        var sign_in = Bmob.Object.extend("sign_in");
+        var query = new Bmob.Query(sign_in);
+//        query.equalTo("s_id", "123456");
+        query.find({
+            success: function(results) {
+                for (var i = 0; i < results.length; i++) {
+                    var object = results[i];
+                    if(searchId==object.get('s_id')&&date==object.createdAt.substr(0,7)){
+                        var date1=object.createdAt;
+                        var date2=results[i+1].createdAt;
+                        if(date1.substr(9,2)==date2.substr(9,2)){
+                            var howlong=date2.substr(11,2)*3600+date2.substr(14,2)*60+date2.substr(17,2)*1-(date1.substr(11,2)*3600+date1.substr(14,2)*60+date1.substr(17,2)*1);
+                            var howlong1=arrive_timer_format(howlong);
+                            alert(object.createdAt + '的学习时间:' +"   "+howlong1);
+                            i++;
+                        }
+                    }
+                }
+            },
+            error: function(error) {
+                alert("查询失败: " + error.code + " " + error.message);
+            }
+        });
+    }
+
+    function searchAllMonth()
+    {
+        var allsec=0;
+        var searchId=document.getElementById("demo").value;
+        var date=document.getElementById("demo1").value;
+        Bmob.initialize("912f235a5242dce2d7d849f726de9ffe","87bc7aeb2892f6ad4e6333a072a67176");
+        var sign_in = Bmob.Object.extend("sign_in");
+        var query = new Bmob.Query(sign_in);
+        query.find({
+            success: function(results) {
+                for (var i = 0; i < results.length; i++) {
+                    var object = results[i];
+                    if(searchId==object.get('s_id')&&date==object.createdAt.substr(0,7)){
+                        var date1=object.createdAt;
+                        var date2=results[i+1].createdAt;
+                        if(date1.substr(9,2)==date2.substr(9,2)){
+                            var howlong=date2.substr(11,2)*3600+date2.substr(14,2)*60+date2.substr(17,2)*1-(date1.substr(11,2)*3600+date1.substr(14,2)*60+date1.substr(17,2)*1);
+                            allsec=allsec+howlong;
+                            i++;
+                        }
+                    }
+                    if(i>=results.length-2){
+                        var howlong1=arrive_timer_format(allsec);
+                        alert('本月的学习时间:'+"   "+howlong1);
+                    }
+
+                }
+
+            },
+            error: function(error) {
+                alert("查询失败: " + error.code + " " + error.message);
+            }
+        });
+
+    }
+</script>
+
+</body>
+</html>

@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<script type="text/javascript" src="jquery.min.js"></script>
+<script type="text/javascript" src="bmob.js"></script>
+<script type="text/javascript" src="bmob-min.js"></script>
+<link type="text/css" rel="stylesheet" href="css/out_login.css">
+<link href="css/bootstrap.min.css" rel="stylesheet">
+<link href="css/styles.css" rel="stylesheet">
+<head>
+    <!--<style type="text/css">-->
+        <!--body{background:#FFBF00;text-align:center;}-->
+        <!--div{width:778px;margin:0 auto;background:#fff;text-align:left;}-->
+    <!--</style>-->
+</head>
+<body>
+
+<!--<h1 align="center" style="display: block; margin-top: 200px;"></h1>-->
+<!--<p align="center">请输入你的登陆秘钥</p>-->
+
+<!--<input id="demo" sstyle="height:35px;" type="text">-->
+
+<!--<button  style="display: block; width: 85px;margin: 0 auto;margin-top: 10px;" type="button" onclick="myFunction()">确认</button>-->
+<!--<div class="col-md-6 col-md-offset-3 text-center">-->
+    <!--<input type="submit" class="learn-more-btn" value=" 登录" onclick="myFunction()" />-->
+<!--</div>-->
+
+<div class="login">
+    <div class="row">
+        <div class="col-md-8 col-md-offset-2 text-center inner"
+             style="padding:0">
+            <form>
+                <p align="center">请输入你的登陆秘钥</p>
+                <input type="password" size="25" style="height:35px;" id="demo" /><br />
+                <br>
+                <div class="row">
+                    <div class="col-md-6 col-md-offset-3 text-center">
+                        <input type="submit" class="learn-more-btn" value="登录" onclick="myFunction()" />
+                    </div>
+                </div>
+
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    function myFunction()
+    {
+        var x=document.getElementById("demo").value;
+        Bmob.initialize("912f235a5242dce2d7d849f726de9ffe","87bc7aeb2892f6ad4e6333a072a67176");
+        var password = Bmob.Object.extend("password");
+        var query = new Bmob.Query(password);
+        query.first({
+            success: function(object) {
+                // 查询成功
+                if(x==object.get('key')){
+                    object.set('state','1');
+                    object.save();
+                    self.location='sign_in_2.html';
+                }else{
+                    alert("请输入正确秘钥");
+                }
+            },
+            error: function(error) {
+                alert("查询失败: " + error.code + " " + error.message);
+            }
+        });
+        alert("正在审核秘钥.....");
+    }
+</script>
+
+</body>
+</html>
